@@ -1,5 +1,4 @@
 import { Admin } from "@prisma/client";
-import { Exclude } from "class-transformer";
 
 export class AdminResponse implements Admin {
     id: string;
