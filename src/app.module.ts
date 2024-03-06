@@ -7,9 +7,10 @@ import { AuthModule } from './services/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './services/auth/guards/jwt-auth.guard';
 import { ConfigModule } from '@nestjs/config';
+import { RoomModule } from './services/room/room.module';
 
 @Module({
-  imports: [PrismaModule, AdminModule, AuthModule, ConfigModule.forRoot({ isGlobal: true })],
+  imports: [PrismaModule, AdminModule, AuthModule, RoomModule, ConfigModule.forRoot({ isGlobal: true })],
   providers: [
     {
       provide: APP_GUARD,
