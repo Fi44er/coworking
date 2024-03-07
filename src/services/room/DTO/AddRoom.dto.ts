@@ -10,6 +10,6 @@ export class AddRoomDto {
     @IsString()
     description: string
 
-    @IsNumber()
-    price: number
+    @IsString()
+    price: string
 }
