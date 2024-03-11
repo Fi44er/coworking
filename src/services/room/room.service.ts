@@ -1,6 +1,5 @@
 // photo.service.ts
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { error } from 'console';
 import { writeFile, writeFileSync } from 'fs';
 import { access, mkdir } from 'fs/promises';
 import { join } from 'path';
@@ -12,39 +11,44 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class RoomService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  // --------------- Add Room --------------- //
-  async addRoom(dto: AddRoomDto) {
-    const room = await this.prismaService.room.create({
-      data: {
+  // ------------------------------ Room ------------------------------ //
+
+  // --------------- Add or Update Room --------------- //
+  async addRoom(dto: AddRoomDto & { id: number }) {
+    const room = await this.prismaService.room.upsert({
+      where: {id: dto.id},
+      create: {
         address: dto.address,
         name: dto.name,
         description: dto.description,
         price: dto.price,
         places: dto.places
+      },
+      update: {
+        address: dto?.address,
+        name: dto?.name,
+        description: dto?.description,
+        price: dto?.price,
+        places: dto?.places
       }
     })
-
     return room
   }
 
+  // --------------- Get Room by id --------------- //
+  async getRoom(roomId: number) {
+    return await this.prismaService.room.findFirst({where: {id: roomId}})
+  }
 
+  // --------------- Delete Room by id --------------- //
+  async deleteRoom(roomId: number) {
+    return await this.prismaService.room.delete({where: {id: roomId}})
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+  // ------------------------------ Picture ------------------------------ //
 
   // --------------- Upload Image --------------- //
-  async uploadImage(roomId: number, files: Express.Multer.File[]) {
+  async uploadPicture(roomId: number, files: Express.Multer.File[]) {
     const uploadFolder = join(__dirname, '../../../../uploads')
 
     try {
@@ -79,6 +83,7 @@ export class RoomService {
     }
   }  
 
+  // --------------- Get Names room by id --------------- //
   async getPicturesByRoomId(roomId: number) {
     return await this.prismaService.picture.findMany({
       where: {roomId: roomId},
@@ -86,5 +91,10 @@ export class RoomService {
         name: true
       }
     })
+  }
+
+  // --------------- Delete Picture by id --------------- //
+  async deletePicture(pictureId: number) {
+    return await this.prismaService.picture.delete({where: {id: pictureId}})
   }
 }
