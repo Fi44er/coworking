@@ -8,9 +8,10 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './services/auth/guards/jwt-auth.guard';
 import { ConfigModule } from '@nestjs/config';
 import { RoomModule } from './services/room/room.module';
+import { OrderModule } from './services/order/order.module';
 
 @Module({
-  imports: [PrismaModule, AdminModule, AuthModule, RoomModule, ConfigModule.forRoot({ isGlobal: true })],
+  imports: [PrismaModule, AdminModule, AuthModule, RoomModule, OrderModule, ConfigModule.forRoot({ isGlobal: true })],
   providers: [
     {
       provide: APP_GUARD,
