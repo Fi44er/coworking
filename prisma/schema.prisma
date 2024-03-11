@@ -35,31 +35,30 @@ model Token {
 
 // --------------- Room Table --------------- //
 model Room {
-  id          Int @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   address     String
   name        String
   description String
   price       Int
-  picturesId  Int[] @map("pictures-id")
   places      Int
 
   application Application[]
-  picture Picture[]
+  picture     Picture[]
 
   @@map("rooms")
 }
 
 // --------------- Buyers Table --------------- //
 model Application {
-  id          Int @id @default(autoincrement())
+  id          Int                 @id @default(autoincrement())
   fio         String
   email       String
   phoneNumber Int
-  room        Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  roomId      Int @map("room-id")
+  room        Room                @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  roomId      Int                 @map("room-id")
   date        DateTime
-  timeStart   DateTime @map("time-start")
-  timeEnd     DateTime @map("time-end")
+  timeStart   DateTime            @map("time-start")
+  timeEnd     DateTime            @map("time-end")
   status      ApplicationStatus[] @default([PENDING])
 
   @@map("applications")
@@ -73,11 +72,10 @@ enum ApplicationStatus {
 
 // --------------- Pictures Table --------------- //
 model Picture {
-  id   Int @id @default(autoincrement())
-  name String
-  application Room @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  applicationId Int @map("application-id")
-
+  id     Int    @id @default(autoincrement())
+  name   String
+  room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  roomId Int    @map("room-id")
 
   @@map("pictures")
-} 
+}
