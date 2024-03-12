@@ -1,7 +1,7 @@
 // photo.service.ts
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { writeFile, writeFileSync } from 'fs';
-import { access, mkdir } from 'fs/promises';
+import { writeFile } from 'fs';
+import { access, mkdir, rm } from 'fs/promises';
 import { join } from 'path';
 import { v4 } from 'uuid'
 import { AddRoomDto } from './DTO/AddRoom.dto';
@@ -14,17 +14,23 @@ export class RoomService {
   // ------------------------------ Room ------------------------------ //
 
   // --------------- Add or Update Room --------------- //
-  async addRoom(dto: AddRoomDto & { id: number }) {
-    const room = await this.prismaService.room.upsert({
-      where: {id: dto.id},
-      create: {
+  async addRoom(dto: AddRoomDto) {
+    const room = await this.prismaService.room.create({
+      data: {
         address: dto.address,
         name: dto.name,
         description: dto.description,
         price: dto.price,
         places: dto.places
-      },
-      update: {
+      }
+    })
+    return room
+  }
+
+  async updateRoom(id: number, dto: AddRoomDto) {
+    const room = await this.prismaService.room.update({
+      where: {id: id},
+      data: {
         address: dto?.address,
         name: dto?.name,
         description: dto?.description,
@@ -32,6 +38,7 @@ export class RoomService {
         places: dto?.places
       }
     })
+
     return room
   }
 
@@ -94,7 +101,9 @@ export class RoomService {
   }
 
   // --------------- Delete Picture by id --------------- //
-  async deletePicture(pictureId: number) {
-    return await this.prismaService.picture.delete({where: {id: pictureId}})
+  async deletePicture(pictureName: string) {
+    const puthToFile = join(__dirname, `../../../../uploads/${pictureName}`)
+    await rm(puthToFile)
+    return await this.prismaService.picture.delete({where: {name: pictureName}})
   }
 }

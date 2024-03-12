@@ -51,15 +51,21 @@ model Room {
 // --------------- Buyers Table --------------- //
 model Order {
   id          Int           @id @default(autoincrement())
-  fio         String
-  email       String
-  phoneNumber Int
   room        Room          @relation(fields: [roomId], references: [id], onDelete: Cascade)
   roomId      Int           @map("room-id")
+
   date        DateTime
   timeStart   DateTime      @map("time-start")
   timeEnd     DateTime      @map("time-end")
-  status      OrderStatus[] @default([PENDING])
+
+  summaryEvent String @map("summary-event")
+
+  fio         String
+  email       String
+  phoneNumber Int @map("phone-number")
+
+  status      OrderStatus @default(PENDING)
+  payment Int @default(0)
 
   @@map("orders")
 }
@@ -73,7 +79,7 @@ enum OrderStatus {
 // --------------- Pictures Table --------------- //
 model Picture {
   id     Int    @id @default(autoincrement())
-  name   String
+  name   String @unique
   room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
   roomId Int    @map("room-id")
 

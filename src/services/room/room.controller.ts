@@ -13,7 +13,7 @@ export class RoomController {
 
   // --------------- Add Room --------------- //
   @Post('add-room')
-  async addRoom(@Body() dto: AddRoomDto & { id: number }) {
+  async addRoom(@Body() dto: AddRoomDto) {
     return this.roomService.addRoom(dto)
   }
 
@@ -24,10 +24,10 @@ export class RoomController {
   }
 
   // --------------- Update Room --------------- //
-  @Put('update-room')
-  async updateRoom(@Body() dto: AddRoomDto & { id: number }) {
-    if(!dto.id) throw new BadRequestException('Не передан идентификатор комнаты')
-    return this.roomService.addRoom(dto)
+  @Put('update-room/:id')
+  async updateRoom(@Param('id') id: number, @Body() dto: AddRoomDto) {
+    if(!id) throw new BadRequestException('Не передан идентификатор комнаты')
+    return this.roomService.updateRoom(+id, dto)
   }
 
   // --------------- Delete Room --------------- //
@@ -43,7 +43,6 @@ export class RoomController {
   @Post('upload-picture/:id')
   @UseInterceptors(FilesInterceptor('image'))
   async uploadPicture(@Param('id') roomId: string, @UploadedFiles() files: Express.Multer.File[]) {
-    console.log(roomId)
     return this.roomService.uploadPicture(+roomId, files)
   }
 
@@ -60,9 +59,9 @@ export class RoomController {
   }
 
   // --------------- Delete Picture by id --------------- //
-  @Delete('delete-picture/:id')
-  async deletePicture(@Param('id') pictureId: string) {
-    return this.roomService.deletePicture(+pictureId)
+  @Delete('delete-picture/:name')
+  async deletePicture(@Param('name') pictureName: string) {
+    return this.roomService.deletePicture(pictureName)
   }
   
 }

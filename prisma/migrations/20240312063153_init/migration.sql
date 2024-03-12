@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "ApplicationStatus" AS ENUM ('ACCEPTED', 'PENDING', 'REJECTED');
+CREATE TYPE "OrderStatus" AS ENUM ('ACCEPTED', 'PENDING', 'REJECTED');
 
 -- CreateTable
 CREATE TABLE "admins" (
@@ -30,7 +30,7 @@ CREATE TABLE "rooms" (
 );
 
 -- CreateTable
-CREATE TABLE "applications" (
+CREATE TABLE "orders" (
     "id" SERIAL NOT NULL,
     "fio" TEXT NOT NULL,
     "email" TEXT NOT NULL,
@@ -39,9 +39,9 @@ CREATE TABLE "applications" (
     "date" TIMESTAMP(3) NOT NULL,
     "time-start" TIMESTAMP(3) NOT NULL,
     "time-end" TIMESTAMP(3) NOT NULL,
-    "status" "ApplicationStatus"[] DEFAULT ARRAY['PENDING']::"ApplicationStatus"[],
+    "status" "OrderStatus" NOT NULL DEFAULT 'PENDING',
 
-    CONSTRAINT "applications_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "orders_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -59,11 +59,14 @@ CREATE UNIQUE INDEX "admins_login_key" ON "admins"("login");
 -- CreateIndex
 CREATE UNIQUE INDEX "tokens_token_key" ON "tokens"("token");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "pictures_name_key" ON "pictures"("name");
+
 -- AddForeignKey
 ALTER TABLE "tokens" ADD CONSTRAINT "tokens_admin-id_fkey" FOREIGN KEY ("admin-id") REFERENCES "admins"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "applications" ADD CONSTRAINT "applications_room-id_fkey" FOREIGN KEY ("room-id") REFERENCES "rooms"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "orders" ADD CONSTRAINT "orders_room-id_fkey" FOREIGN KEY ("room-id") REFERENCES "rooms"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "pictures" ADD CONSTRAINT "pictures_room-id_fkey" FOREIGN KEY ("room-id") REFERENCES "rooms"("id") ON DELETE CASCADE ON UPDATE CASCADE;
