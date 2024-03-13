@@ -54,7 +54,6 @@ model Order {
   room        Room          @relation(fields: [roomId], references: [id], onDelete: Cascade)
   roomId      Int           @map("room-id")
 
-  date        DateTime
   timeStart   DateTime      @map("time-start")
   timeEnd     DateTime      @map("time-end")
 

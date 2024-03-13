@@ -5,9 +5,6 @@ export class CreateOrderDto {
     roomId: number
 
     @IsString()
-    date: string
-
-    @IsString()
     timeStart: string
 
     @IsString()
