@@ -35,7 +35,7 @@ export class OrderService {
     }
 
     // --------------- checking for a record for a period of time --------------- //
-    private async checkingFreeTime(timeStart: Date, timeEnd: Date) {
+    private async checkingFreeTime(timeStart: Date, timeEnd: Date): Promise<boolean> {
         const existOrders = await this.prismaService.order.findMany({
             select: {
                 timeStart: true,
@@ -50,7 +50,6 @@ export class OrderService {
                 return existingStatus
             }
         });
-
         return existingStatus
     }
 

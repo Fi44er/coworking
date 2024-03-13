@@ -1,6 +1,6 @@
 // photo.service.ts
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { writeFile } from 'fs';
+import { accessSync, existsSync, writeFile } from 'fs';
 import { access, mkdir, rm } from 'fs/promises';
 import { join } from 'path';
 import { v4 } from 'uuid'
@@ -28,6 +28,8 @@ export class RoomService {
   }
 
   async updateRoom(id: number, dto: AddRoomDto) {
+    const existRoom = await this.prismaService.room.findUnique({where: {id}})
+    if(!existRoom) throw new BadRequestException('Такой комнаты не существует')
     const room = await this.prismaService.room.update({
       where: {id: id},
       data: {
@@ -38,7 +40,6 @@ export class RoomService {
         places: dto?.places
       }
     })
-
     return room
   }
 
@@ -57,6 +58,9 @@ export class RoomService {
   // --------------- Upload Image --------------- //
   async uploadPicture(roomId: number, files: Express.Multer.File[]) {
     const uploadFolder = join(__dirname, '../../../../uploads')
+
+    const room = await this.prismaService.room.findUnique({where: {id: roomId}})
+    if(!room) throw new BadRequestException('Такого помещения не существует')
 
     try {
       await access(uploadFolder)
@@ -102,6 +106,8 @@ export class RoomService {
 
   // --------------- Delete Picture by id --------------- //
   async deletePicture(pictureName: string) {
+    const existFile = existsSync(`../../../../uploads/${pictureName}`)
+    if(!existFile) throw new BadRequestException('Такого файла не существует')
     const puthToFile = join(__dirname, `../../../../uploads/${pictureName}`)
     await rm(puthToFile)
     return await this.prismaService.picture.delete({where: {name: pictureName}})
