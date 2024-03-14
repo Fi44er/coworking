@@ -2,10 +2,14 @@ import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, R
 import { Public } from "lib/decorators/public.decorator";
 import { RoomService } from "./room.service";
 import { FilesInterceptor } from "@nestjs/platform-express";
-import { AddRoomDto } from "./DTO/AddRoom.dto";
+import { CreateRoomDto } from "./DTO/CreateRoom.dto";
 import { Response } from "express";
+import { GetPicturesNameResponse } from "./Response/GetPicturesName.response";
+import { RoomResponse } from "./Response/Room.response.dto";
+import { ApiBadRequestResponse, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @Public()
+@ApiTags('rooms')
 @Controller('room')
 export class RoomController {
   constructor(private readonly roomService: RoomService) {}
@@ -13,55 +17,79 @@ export class RoomController {
 
   // --------------- Add Room --------------- //
   @Post('add-room')
-  async addRoom(@Body() dto: AddRoomDto) {
-    return this.roomService.addRoom(dto)
+  @ApiOperation({ summary: 'Add a new room' })
+  @ApiBody({ type: CreateRoomDto })
+  @ApiResponse({ status: 201, description: 'Room successfully created', type: RoomResponse })
+  async addRoom(@Body() dto: CreateRoomDto): Promise<RoomResponse> {
+    return this.roomService.addRoom(dto);
   }
 
-  // --------------- Get Room --------------- //
+  // --------------- Get Room by id --------------- //
   @Get('get-room/:id')
-  async getRoom(@Param('id') roomId: string) {
-    return this.roomService.getRoom(+roomId)
+  @ApiOperation({ summary: 'Get room by id' })
+  @ApiParam({ name: 'id', description: 'Room ID' })
+  @ApiResponse({ status: 200, description: 'Room found', type: RoomResponse })
+  async getRoom(@Param('id') roomId: string): Promise<RoomResponse> {
+    return this.roomService.getRoom(+roomId);
   }
 
-  // --------------- Update Room --------------- //
+  // --------------- Update Room by id --------------- //
   @Put('update-room/:id')
-  async updateRoom(@Param('id') id: number, @Body() dto: AddRoomDto) {
-    if(!id) throw new BadRequestException('Не передан идентификатор комнаты')
-    return this.roomService.updateRoom(+id, dto)
+  @ApiOperation({ summary: 'Update room by id' })
+  @ApiParam({ name: 'id', description: 'Room ID' })
+  @ApiBody({ type: CreateRoomDto })
+  @ApiResponse({ status: 200, description: 'Room successfully updated', type: RoomResponse })
+  @ApiBadRequestResponse({ description: 'Bad request' })
+  async updateRoom(@Param('id') id: number, @Body() dto: Partial<CreateRoomDto>): Promise<RoomResponse> {
+    if (!id) throw new BadRequestException('Room ID not provided');
+    return this.roomService.updateRoom(+id, dto);
   }
 
-  // --------------- Delete Room --------------- //
+  // --------------- Delete Room by id --------------- //
   @Delete('delete-room/:id')
-  async deleteRoom(@Param('id') roomId: string) {
-    return this.roomService.deleteRoom(+roomId)
+  @ApiOperation({ summary: 'Delete room by id' })
+  @ApiParam({ name: 'id', description: 'Room ID' })
+  @ApiResponse({ status: 200, description: 'Room successfully deleted' })
+  async deleteRoom(@Param('id') roomId: string): Promise<boolean> {
+    return this.roomService.deleteRoom(+roomId);
   }
-
 
   // ------------------------------ Picture ------------------------------ //
 
-  // --------------- Upload Picture --------------- //
+  // --------------- Upload Picture by room id --------------- //
   @Post('upload-picture/:id')
+  @ApiOperation({ summary: 'Upload picture by room id' })
+  @ApiParam({ name: 'id', description: 'Room ID' })
   @UseInterceptors(FilesInterceptor('image'))
-  async uploadPicture(@Param('id') roomId: string, @UploadedFiles() files: Express.Multer.File[]) {
-    return this.roomService.uploadPicture(+roomId, files)
+  @ApiResponse({ status: 200, description: 'Pictures successfully uploaded', type: [GetPicturesNameResponse] })
+  async uploadPicture(@Param('id') roomId: string, @UploadedFiles() files: Express.Multer.File[]): Promise<GetPicturesNameResponse[]> {
+    return this.roomService.uploadPicture(+roomId, files);
   }
 
   // --------------- Get Names picture by room id --------------- //
   @Get('get-names-picture-by-room-id/:id')
-  async getNamesPictureByRoomId(@Param('id') roomId: string) {
-    return this.roomService.getPicturesByRoomId(+roomId)
+  @ApiOperation({ summary: 'Get names of pictures by room id' })
+  @ApiParam({ name: 'id', description: 'Room ID' })
+  @ApiResponse({ status: 200, description: 'Pictures names retrieved', type: [GetPicturesNameResponse] })
+  async getNamesPictureByRoomId(@Param('id') roomId: string): Promise<GetPicturesNameResponse[]> {
+    return this.roomService.getPicturesByRoomId(+roomId);
   }
 
   // --------------- Get Picture by name --------------- //
   @Get("get-picture-by-name/:name")
-  async getPicture(@Param("name") filename: string, @Res() res: Response) {
-    res.sendFile(filename, { root: 'uploads'});
+  @ApiOperation({ summary: 'Get picture by name' })
+  @ApiParam({ name: 'name', description: 'Picture name' })
+  @ApiResponse({ status: 200, description: 'Picture retrieved' })
+  async getPicture(@Param("name") filename: string, @Res() res: Response): Promise<void> {
+    res.sendFile(filename, { root: 'uploads' });
   }
 
   // --------------- Delete Picture by id --------------- //
   @Delete('delete-picture/:name')
-  async deletePicture(@Param('name') pictureName: string) {
-    return this.roomService.deletePicture(pictureName)
-  }
-  
+  @ApiOperation({ summary: 'Delete picture by name' })
+  @ApiParam({ name: 'name', description: 'Picture name' })
+  @ApiResponse({ status: 200, description: 'Picture deleted', type: Boolean })
+  async deletePicture(@Param('name') pictureName: string): Promise<boolean> {
+    return this.roomService.deletePicture(pictureName);
+  }  
 }
