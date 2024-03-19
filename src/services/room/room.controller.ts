@@ -24,6 +24,14 @@ export class RoomController {
     return this.roomService.addRoom(dto);
   }
 
+  // --------------- Get All Rooms --------------- //
+  @Get('get-all-rooms')
+  @ApiOperation({ summary: 'Get all rooms' })
+  @ApiResponse({ status: 200, description: 'Rooms found', type: [RoomResponse] })
+  async getAllRooms(): Promise<RoomResponse[]> {
+    return this.roomService.getAllRooms();
+  }
+
   // --------------- Get Room by id --------------- //
   @Get('get-room/:id')
   @ApiOperation({ summary: 'Get room by id' })

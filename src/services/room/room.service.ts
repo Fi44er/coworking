@@ -29,6 +29,11 @@ export class RoomService {
     return room
   }
 
+  // --------------- Get All Rooms --------------- //
+  async getAllRooms(): Promise<RoomResponse[]> {
+    return await this.prismaService.room.findMany()
+  }
+
   // --------------- Update Room --------------- //
   async updateRoom(id: number, dto: Partial<CreateRoomDto>): Promise<RoomResponse> {
     const existRoom = await this.prismaService.room.findUnique({where: {id}})

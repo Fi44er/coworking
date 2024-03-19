@@ -18,6 +18,7 @@ export class AuthService {
         private readonly adminService: AdminService
     ) {}
 
+    // --------------- Login --------------- //
     async login(dto: LoginAdminDto): Promise<Tokens> {
         const admin = await this.adminService.findOneAdmin(dto.login).catch(err => {
             this.logger.error(err)

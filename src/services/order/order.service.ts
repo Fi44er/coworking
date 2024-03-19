@@ -5,6 +5,7 @@ import { CreateOrderDto } from './DTO/CreateOrder.dto';
 import { OrderResponse } from './Response/Order.response';
 import { UpdateOrderDto } from './DTO/UpdateOrder.dto';
 import { convertStringToTime } from 'lib/utils/convertStringToDate.util';
+import { OrderStatus } from '@prisma/client';
 
 
 @Injectable()
@@ -83,7 +84,22 @@ export class OrderService {
     async deleteOrder(id: number): Promise<boolean> {
         const order = await this.prismaService.order.findUnique({where: {id}})
         if(!order) return true
-        await this.prismaService.order.delete({where: {id}})
+        this.prismaService.order.delete({where: {id}})
         return true
     }
+
+    // --------------- Update order status --------------- //
+    async updateOrderStatus(id: number, status: OrderStatus) {
+        const order = await this.prismaService.order.findFirst({where: {id}})
+        if(!order) throw new BadRequestException('Такой заявки не существует')
+        this.prismaService.order.update({
+            where: {id},
+            data: {
+                status: status
+            }
+        })
+
+        return status
+    }
+
 }

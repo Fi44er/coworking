@@ -5,6 +5,7 @@ import { Public } from 'lib/decorators/public.decorator';
 import { OrderResponse } from './Response/Order.response';
 import { UpdateOrderDto } from './DTO/UpdateOrder.dto';
 import { ApiTags, ApiBody, ApiParam, ApiResponse, ApiOperation } from '@nestjs/swagger';
+import { OrderStatus } from '@prisma/client';
 
 @Public()
 @Controller('order')
@@ -21,9 +22,12 @@ export class OrderController {
     return this.orderService.createOrder(dto);
   }
 
-  // --------------- Delete Order --------------- //
+
+  // ------------------------------ Management Order ------------------------------ //
+
+  //  --------------- Delete Order --------------- //
   @Delete('delete-order/:id')
-  @ApiOperation({ summary: 'Delete order by ID' })
+  @ApiOperation({ summary: 'Dc  elete order by ID' })
   @ApiParam({ name: 'id', description: 'Order ID' })
   @ApiResponse({ status: 200, description: 'Order deleted', type: Boolean })
   async deleteOrder(@Param('id') id: string): Promise<boolean> {
@@ -38,5 +42,11 @@ export class OrderController {
   @ApiResponse({ status: 200, description: 'Order updated', type: OrderResponse })
   async updateOrder(@Param('id') id: string, @Body() dto: UpdateOrderDto): Promise<OrderResponse> {
     return this.orderService.updateOrder(+id, dto);
+  }
+
+  // --------------- Update Order satus --------------- //
+  @Put('update-order-status/:id')
+  async updateOrderStatus(@Param('id') id: string, @Body() status: OrderStatus): Promise<OrderStatus> {
+    return this.orderService.updateOrderStatus(+id, status)
   }
 }

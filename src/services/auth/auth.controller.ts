@@ -19,6 +19,7 @@ export class AuthController {
     private readonly configService: ConfigService   
   ) {}
 
+  // --------------- Login --------------- //
   @Post('Login')
   @ApiOperation({ summary: 'Login' })
   @ApiBody({ type: LoginAdminDto })
@@ -29,6 +30,7 @@ export class AuthController {
     return this.setRefreshTokenToCookie(tokens, res);
   }
 
+  // --------------- Logout --------------- //
   @Get('logout')
   @ApiOperation({ summary: 'Logout' })
   async logout(@Cookie(REFRESH_TOKEN) refreshToken: string, @Res() res: Response): Promise<Response> {
@@ -38,6 +40,7 @@ export class AuthController {
     return res.sendStatus(HttpStatus.OK);
   }
 
+  // --------------- Refreshing tokens --------------- //
   @Get('refresh-tokens')
   @ApiOperation({ summary: 'Refresh tokens' })
   @ApiResponse({ status: 201, description: 'Tokens refreshed' })
@@ -48,6 +51,7 @@ export class AuthController {
     return this.setRefreshTokenToCookie(tokens, res);
   }
 
+  // --------------- Set token in cookie --------------- //
   private setRefreshTokenToCookie(tokens: Tokens, res: Response): Response {
     if (!tokens) throw new UnauthorizedException();
     res.cookie(REFRESH_TOKEN, tokens.refreshToken.token, {
