@@ -1,6 +1,6 @@
 // photo.service.ts
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { accessSync, existsSync, writeFile } from 'fs';
+import { existsSync, writeFile } from 'fs';
 import { access, mkdir, rm } from 'fs/promises';
 import { join } from 'path';
 import { v4 } from 'uuid'
@@ -64,7 +64,6 @@ export class RoomService {
     return true
   }
 
-
   // ------------------------------ Picture ------------------------------ //
 
   // --------------- Upload Image --------------- //
@@ -91,7 +90,7 @@ export class RoomService {
           return
         }
         const newname = `${v4()}.${file.originalname.split('.')[1]}`
-        await writeFile(join(uploadFolder, newname), file.buffer, (error) => {
+        writeFile(join(uploadFolder, newname), file.buffer, (error) => {
           if(error) throw new InternalServerErrorException('Ошибка при записи фото')
         })
         picturesName.push({roomId: roomId, name: newname})
@@ -120,7 +119,7 @@ export class RoomService {
     const existFile = existsSync(`../../../../uploads/${pictureName}`)
     if(!existFile) throw new BadRequestException('Такого файла не существует')
     const puthToFile = join(__dirname, `../../../../uploads/${pictureName}`)
-    await rm(puthToFile)
+    rm(puthToFile)
     await this.prismaService.picture.delete({where: {name: pictureName}})
     return true
   }

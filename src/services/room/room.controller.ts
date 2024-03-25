@@ -20,6 +20,7 @@ export class RoomController {
   @ApiOperation({ summary: 'Add a new room' })
   @ApiBody({ type: CreateRoomDto })
   @ApiResponse({ status: 201, description: 'Room successfully created', type: RoomResponse })
+  
   async addRoom(@Body() dto: CreateRoomDto): Promise<RoomResponse> {
     return this.roomService.addRoom(dto);
   }
@@ -28,6 +29,7 @@ export class RoomController {
   @Get('get-all-rooms')
   @ApiOperation({ summary: 'Get all rooms' })
   @ApiResponse({ status: 200, description: 'Rooms found', type: [RoomResponse] })
+
   async getAllRooms(): Promise<RoomResponse[]> {
     return this.roomService.getAllRooms();
   }
@@ -37,6 +39,7 @@ export class RoomController {
   @ApiOperation({ summary: 'Get room by id' })
   @ApiParam({ name: 'id', description: 'Room ID' })
   @ApiResponse({ status: 200, description: 'Room found', type: RoomResponse })
+
   async getRoom(@Param('id') roomId: string): Promise<RoomResponse> {
     return this.roomService.getRoom(+roomId);
   }
@@ -48,6 +51,7 @@ export class RoomController {
   @ApiBody({ type: CreateRoomDto })
   @ApiResponse({ status: 200, description: 'Room successfully updated', type: RoomResponse })
   @ApiBadRequestResponse({ description: 'Bad request' })
+
   async updateRoom(@Param('id') id: number, @Body() dto: Partial<CreateRoomDto>): Promise<RoomResponse> {
     if (!id) throw new BadRequestException('Room ID not provided');
     return this.roomService.updateRoom(+id, dto);
@@ -58,6 +62,7 @@ export class RoomController {
   @ApiOperation({ summary: 'Delete room by id' })
   @ApiParam({ name: 'id', description: 'Room ID' })
   @ApiResponse({ status: 200, description: 'Room successfully deleted' })
+
   async deleteRoom(@Param('id') roomId: string): Promise<boolean> {
     return this.roomService.deleteRoom(+roomId);
   }
@@ -70,6 +75,7 @@ export class RoomController {
   @ApiParam({ name: 'id', description: 'Room ID' })
   @UseInterceptors(FilesInterceptor('image'))
   @ApiResponse({ status: 200, description: 'Pictures successfully uploaded', type: [GetPicturesNameResponse] })
+
   async uploadPicture(@Param('id') roomId: string, @UploadedFiles() files: Express.Multer.File[]): Promise<GetPicturesNameResponse[]> {
     return this.roomService.uploadPicture(+roomId, files);
   }
@@ -79,6 +85,7 @@ export class RoomController {
   @ApiOperation({ summary: 'Get names of pictures by room id' })
   @ApiParam({ name: 'id', description: 'Room ID' })
   @ApiResponse({ status: 200, description: 'Pictures names retrieved', type: [GetPicturesNameResponse] })
+
   async getNamesPictureByRoomId(@Param('id') roomId: string): Promise<GetPicturesNameResponse[]> {
     return this.roomService.getPicturesByRoomId(+roomId);
   }
@@ -88,6 +95,7 @@ export class RoomController {
   @ApiOperation({ summary: 'Get picture by name' })
   @ApiParam({ name: 'name', description: 'Picture name' })
   @ApiResponse({ status: 200, description: 'Picture retrieved' })
+
   async getPicture(@Param("name") filename: string, @Res() res: Response): Promise<void> {
     res.sendFile(filename, { root: 'uploads' });
   }
@@ -97,6 +105,7 @@ export class RoomController {
   @ApiOperation({ summary: 'Delete picture by name' })
   @ApiParam({ name: 'name', description: 'Picture name' })
   @ApiResponse({ status: 200, description: 'Picture deleted', type: Boolean })
+
   async deletePicture(@Param('name') pictureName: string): Promise<boolean> {
     return this.roomService.deletePicture(pictureName);
   }  
