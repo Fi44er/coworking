@@ -6,11 +6,15 @@ import { OrderResponse } from './Response/Order.response';
 import { UpdateOrderDto } from './DTO/UpdateOrder.dto';
 import { convertStringToTime } from 'lib/utils/convertStringToDate.util';
 import { OrderStatus } from '@prisma/client';
+import { EmailService } from '../mailer/mailer.service';
 
 
 @Injectable()
 export class OrderService {
-    constructor(private readonly prismaService: PrismaService) {}
+    constructor(
+        private readonly prismaService: PrismaService,
+        private readonly emailService: EmailService
+    ) {}
 
     // ------------------------------ Order ------------------------------ //
 
@@ -36,6 +40,7 @@ export class OrderService {
                 payment
             }
         })
+        await this.emailService.sendEmail(dto);
         return order
     }
 

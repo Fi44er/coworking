@@ -6,6 +6,7 @@ import { OrderResponse } from './Response/Order.response';
 import { UpdateOrderDto } from './DTO/UpdateOrder.dto';
 import { ApiTags, ApiBody, ApiParam, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { OrderStatus } from '@prisma/client';
+import { EmailService } from '../mailer/mailer.service';
 
 @Public()
 @Controller('order')
@@ -27,7 +28,7 @@ export class OrderController {
 
   //  --------------- Delete Order --------------- //
   @Delete('delete-order/:id')
-  @ApiOperation({ summary: 'Dc  elete order by ID' })
+  @ApiOperation({ summary: 'Delete order by ID' })
   @ApiParam({ name: 'id', description: 'Order ID' })
   @ApiResponse({ status: 200, description: 'Order deleted', type: Boolean })
   async deleteOrder(@Param('id') id: string): Promise<boolean> {

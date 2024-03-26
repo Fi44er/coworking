@@ -20,7 +20,7 @@ export class OrderResponse {
     fio: string
     
     @ApiProperty()
-    phoneNumber: number
+    phoneNumber: string
     
     @ApiProperty()
     status: string

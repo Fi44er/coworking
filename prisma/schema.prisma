@@ -61,7 +61,7 @@ model Order {
 
   fio         String
   email       String
-  phoneNumber Int @map("phone-number")
+  phoneNumber String @map("phone-number")
 
   status      OrderStatus @default(PENDING)
   payment Int @default(0)

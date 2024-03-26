@@ -67,7 +67,6 @@ export class AuthService {
     }
 
     // Удаление refresh токена
-
     deleteRefreshToken(token: string) {
         return this.prismaService.token.delete({ where: { token } })
     }
