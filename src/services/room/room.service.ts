@@ -1,6 +1,6 @@
 // photo.service.ts
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { existsSync, writeFile } from 'fs';
+import { existsSync, readFile, readFileSync, writeFile } from 'fs';
 import { access, mkdir, rm } from 'fs/promises';
 import { join } from 'path';
 import { v4 } from 'uuid'
@@ -9,13 +9,15 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { GetPicturesNameResponse } from './Response/GetPicturesName.response';
 import { RoomResponse } from './Response/Room.response.dto';
 
+const uploadFolder = join(__dirname, '../../../uploads')
 @Injectable()
 export class RoomService {
   constructor(private readonly prismaService: PrismaService) {}
 
+
   // ------------------------------ Room ------------------------------ //
 
-  // --------------- Add or Update Room --------------- //
+  // --------------- Add Room --------------- //
   async addRoom(dto: CreateRoomDto): Promise<RoomResponse> {
     const room = await this.prismaService.room.create({
       data: {
@@ -31,7 +33,16 @@ export class RoomService {
 
   // --------------- Get All Rooms --------------- //
   async getAllRooms(): Promise<RoomResponse[]> {
-    return await this.prismaService.room.findMany()
+    const rooms = await this.prismaService.room.findMany({
+      include: {
+        picture: {
+          select: {
+            name: true
+          }
+        }
+      }
+    })
+    return rooms
   }
 
   // --------------- Update Room --------------- //
@@ -53,7 +64,17 @@ export class RoomService {
 
   // --------------- Get Room by id --------------- //
   async getRoom(roomId: number): Promise<RoomResponse> {
-    return await this.prismaService.room.findFirst({where: {id: roomId}})
+    const room = await this.prismaService.room.findFirst({
+      where: {id: roomId},
+      include: {
+        picture: {
+          select: {
+            name: true
+          }
+        }
+      }
+    })
+    return room
   }
 
   // --------------- Delete Room by id --------------- //
@@ -68,7 +89,6 @@ export class RoomService {
 
   // --------------- Upload Image --------------- //
   async uploadPicture(roomId: number, files: Express.Multer.File[]): Promise<GetPicturesNameResponse[]> {
-    const uploadFolder = join(__dirname, '../../../../uploads')
 
     const room = await this.prismaService.room.findUnique({where: {id: roomId}})
     if(!room) throw new BadRequestException('Такого помещения не существует')
@@ -102,23 +122,13 @@ export class RoomService {
       await this.prismaService.picture.createMany({data: picturesName})
       return picturesName
     }
-  }  
-
-  // --------------- Get Names room by id --------------- //
-  async getPicturesByRoomId(roomId: number): Promise<GetPicturesNameResponse[]> {
-    return await this.prismaService.picture.findMany({
-      where: {roomId: roomId},
-      select: {
-        name: true
-      }
-    })
   }
 
   // --------------- Delete Picture by id --------------- //
   async deletePicture(pictureName: string): Promise<boolean> {
-    const existFile = existsSync(`../../../../uploads/${pictureName}`)
+    const existFile = existsSync(uploadFolder + '/' + pictureName)
     if(!existFile) throw new BadRequestException('Такого файла не существует')
-    const puthToFile = join(__dirname, `../../../../uploads/${pictureName}`)
+    const puthToFile = uploadFolder + '/' + pictureName
     rm(puthToFile)
     await this.prismaService.picture.delete({where: {name: pictureName}})
     return true

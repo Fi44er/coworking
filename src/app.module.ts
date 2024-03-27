@@ -10,9 +10,15 @@ import { ConfigModule } from '@nestjs/config';
 import { RoomModule } from './services/room/room.module';
 import { OrderModule } from './services/order/order.module';
 import { EmailsModule } from './services/mailer/mailer.module';
+import { join, resolve } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
-  imports: [EmailsModule, PrismaModule, AdminModule, AuthModule, RoomModule, OrderModule, ConfigModule.forRoot({ isGlobal: true })],
+  imports: [
+    ServeStaticModule.forRoot({rootPath: join(__dirname, '..', 'uploads')}),
+    ConfigModule.forRoot({ isGlobal: true }),
+    EmailsModule, PrismaModule, AdminModule, AuthModule, RoomModule, OrderModule, 
+  ],
   providers: [
     {
       provide: APP_GUARD,

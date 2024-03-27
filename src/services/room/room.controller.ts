@@ -80,26 +80,6 @@ export class RoomController {
     return this.roomService.uploadPicture(+roomId, files);
   }
 
-  // --------------- Get Names picture by room id --------------- //
-  @Get('get-names-picture-by-room-id/:id')
-  @ApiOperation({ summary: 'Get names of pictures by room id' })
-  @ApiParam({ name: 'id', description: 'Room ID' })
-  @ApiResponse({ status: 200, description: 'Pictures names retrieved', type: [GetPicturesNameResponse] })
-
-  async getNamesPictureByRoomId(@Param('id') roomId: string): Promise<GetPicturesNameResponse[]> {
-    return this.roomService.getPicturesByRoomId(+roomId);
-  }
-
-  // --------------- Get Picture by name --------------- //
-  @Get("get-picture-by-name/:name")
-  @ApiOperation({ summary: 'Get picture by name' })
-  @ApiParam({ name: 'name', description: 'Picture name' })
-  @ApiResponse({ status: 200, description: 'Picture retrieved' })
-
-  async getPicture(@Param("name") filename: string, @Res() res: Response): Promise<void> {
-    res.sendFile(filename, { root: 'uploads' });
-  }
-
   // --------------- Delete Picture by id --------------- //
   @Delete('delete-picture/:name')
   @ApiOperation({ summary: 'Delete picture by name' })
